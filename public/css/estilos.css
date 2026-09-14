@@ -1,0 +1,729 @@
+:root{
+  --navy-900:#08192E; --navy-800:#0B2545; --navy-700:#13315C; --navy-100:#E7ECF3;
+  /* Azul corporativo, tomado del logo (#008FD5). Reemplaza al dorado, que
+     no pertenece a la identidad de la marca.
+       600 para botones y texto sobre blanco (contraste suficiente)
+       500 es el color de marca
+       400 aclarado, para leerse sobre el azul oscuro de la barra
+       100 / 050 fondos */
+  --cian-600:#0077B3; --cian-500:#008FD5; --cian-400:#4FB3E8;
+  --cian-100:#DCEEF9; --cian-050:#EFF7FD;
+  /* El ambar queda SOLO para avisos. Un color de advertencia es
+     semantico, no de marca: si se usa como acento deja de alertar. */
+  --ambar-500:#C9A227; --ambar-400:#E0B93B; --ambar-100:#F7EFD6;
+  --gris-050:#F6F7F9; --gris-300:#D4D9E0; --gris-600:#5B6675;
+  /* Fondo de pagina y gris de rotulos, un punto mas frios que el gris
+     anterior: es lo que hace que el blanco de las tarjetas se despegue. */
+  --fondo:#F4F6FB; --gris-rotulo:#8892A4;
+
+  /* Color por CATEGORIA, no por decoracion. Un mismo tono no puede
+     significar dos cosas en la misma pantalla:
+       azul  lo que entra          rojo  lo que sale o lo que falta
+       cian  el resultado          ambar el costo que hay que vigilar
+       verde lo que ya se cumplio                                     */
+  --c-azul:#1D4ED8;  --c-azul-f:#E6EEFE;  --c-azul-t:#1D4ED8;
+  --c-rojo:#DC2626;  --c-rojo-f:#FDE8E8;  --c-rojo-t:#B4232A;
+  --c-cian:#008FD5;  --c-cian-f:#DCEEF9;  --c-cian-t:#0077B3;
+  --c-ambar:#EAB308; --c-ambar-f:#FBF3D6; --c-ambar-t:#8A6D00;
+  --c-verde:#0EA47A; --c-verde-f:#DCF5EC; --c-verde-t:#0B8A66;
+  --c-navy:#13315C;  --c-navy-f:#E7ECF3;  --c-navy-t:#13315C;
+
+  /* Las cifras van en la MISMA fuente corporativa, con cifras tabulares:
+     font-variant-numeric hace que todos los digitos ocupen lo mismo, asi
+     que una columna de importes queda alineada y se compara de un vistazo,
+     sin traer una tipografia ajena a la marca. */
+  --cifras:var(--fuente);
+}
+/* Tipografia corporativa.
+
+   Proxima Nova es comercial: no se puede empotrar en el sitio sin
+   licencia. Se pide primero por si esta instalada en el equipo -- ahi el
+   navegador la usa tal cual -- y si no, cae en Montserrat, que es la
+   sustituta libre mas cercana. Los nombres alternos son como la
+   registran distintas versiones de la fuente en Windows. */
+:root{
+  --fuente: "Proxima Nova", "Proxima Nova Rg", "ProximaNova-Regular", "Proxima Nova Regular",
+            Montserrat, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+body{background:var(--fondo);color:var(--navy-900);font-family:var(--fuente);}
+.form-control, .form-select, .btn, .table, input, select, textarea{font-family:var(--fuente);}
+
+/* =====================================================================
+   Banda de encabezado
+
+   El degradado no es uno cualquiera: es el azul del logo estirado, del
+   navy de la marca al cian del logotipo. Cualquier otro par de colores
+   habria sido decoracion.
+   ===================================================================== */
+.banda{background:linear-gradient(100deg,#08192E 0%,var(--navy-800) 26%,
+                                  var(--cian-600) 68%,#22BEE6 100%);
+       color:#fff;padding:12px 34px 20px;}
+.banda-top{display:flex;align-items:center;gap:14px;margin-bottom:12px;}
+.banda-top img{height:30px;width:auto;display:block;}
+.banda-top .acciones{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.banda-cuerpo{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;}
+.banda .contexto{font-size:11px;font-weight:700;letter-spacing:1.6px;
+                 color:#B6DDF2;text-transform:uppercase;}
+.banda h1{font-size:27px;font-weight:700;letter-spacing:-.3px;margin:5px 0 0;line-height:1.15;}
+.banda .periodo{font-size:12.5px;color:#CDE6F6;margin-top:4px;}
+/* Las dos cifras de volumen, a la derecha de la banda. Van del mismo
+   tamaño entre si: son dos formas de medir lo mismo -- cuantos viajes y
+   cuanta carga -- y una mas grande que la otra insinuaria una jerarquia
+   que no existe. */
+.banda .destacado{display:flex;align-items:flex-end;gap:38px;text-align:right;}
+/* Proxima Nova, la misma de todo el informe (var(--cifras) apunta a
+   var(--fuente)); lo unico propio es font-variant-numeric, que hace que
+   todos los digitos ocupen igual y las dos cifras queden a plomo. */
+.banda .destacado .cifra{font-family:var(--cifras);font-variant-numeric:tabular-nums;
+                         font-weight:800;font-size:42px;letter-spacing:-.8px;margin-top:4px;
+                         line-height:1.08;white-space:nowrap;}
+.banda .destacado .cifra .u{font-size:.42em;font-weight:700;letter-spacing:0;
+                            margin-left:5px;color:#B6DDF2;}
+.banda .destacado .cifra.cargando{color:#B6DDF2;font-size:24px;font-weight:700;letter-spacing:0;}
+@media (max-width:1200px){
+  .banda .destacado{gap:26px;}
+  .banda .destacado .cifra{font-size:33px;letter-spacing:-.6px;}
+}
+@media (max-width:900px){
+  .banda-cuerpo{flex-direction:column;align-items:flex-start;}
+  .banda .destacado{text-align:left;gap:28px;}
+}
+
+/* Pastillas de periodo. La activa en navy solido: se ve cual esta puesto
+   sin leer las fechas. */
+.pastilla{font-size:12px;font-weight:600;border-radius:20px;padding:6px 16px;
+          border:1px solid var(--gris-300);background:#fff;color:var(--gris-600);
+          white-space:nowrap;cursor:pointer;transition:all .15s ease;}
+.pastilla:hover{border-color:var(--cian-500);color:var(--cian-600);}
+.pastilla.on{background:var(--navy-800);border-color:var(--navy-800);color:#fff;}
+
+/* Rotulo de seccion */
+.seccion{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;
+         color:var(--gris-rotulo);font-weight:700;margin:0 0 9px 4px;}
+
+.card{border:1px solid var(--gris-300);border-radius:10px;box-shadow:0 1px 2px rgba(8,25,46,.06);}
+.card-header{background:var(--navy-100);border-bottom:1px solid var(--gris-300);
+             font-weight:600;color:var(--navy-800);}
+.btn-navy{background:var(--navy-700);border-color:var(--navy-700);color:#fff;}
+.btn-navy:hover{background:var(--navy-800);border-color:var(--navy-800);color:#fff;}
+.btn-acento{background:var(--cian-600);border-color:var(--cian-600);color:#fff;font-weight:600;}
+.btn-acento:hover{background:var(--cian-500);border-color:var(--cian-500);color:#fff;}
+.table thead th{background:var(--navy-700);color:#fff;font-weight:600;
+                font-size:.82rem;text-transform:uppercase;letter-spacing:.4px;}
+.table tbody tr.inactiva{opacity:.5;}
+.badge-factura{background:var(--navy-700);}
+.badge-flete{background:var(--cian-500);color:#fff;}
+.prioridad{font-variant-numeric:tabular-nums;font-weight:600;color:var(--gris-600);}
+.ruta-chip{display:inline-block;background:var(--cian-100);border:1px solid var(--cian-500);
+           border-radius:12px;padding:1px 9px;font-size:.78rem;margin:1px 2px;}
+.tabla-scroll{overflow-x:auto;}
+
+/* --- listado Rebate --- */
+/* =====================================================================
+   Barra de filtros y chips de lo aplicado
+   ===================================================================== */
+.barra-filtros{background:#fff;border-radius:14px;padding:14px 18px 12px;
+               box-shadow:0 1px 3px rgba(11,37,69,.10), 0 1px 2px rgba(11,37,69,.06);}
+/* Las etiquetas de campo en versalitas diminutas se leian como letra de
+   sistema. En caja normal, un punto mas grandes y en el navy de la marca,
+   se leen como parte de un producto. Las versalitas se reservan para los
+   rotulos de dato -- tarjetas, chips, encabezados de tabla -- donde
+   etiquetan una cifra y no piden nada. */
+.barra-filtros .form-label, #panelFiltros .form-label{
+  color:var(--navy-700);font-weight:600;font-size:11.5px;letter-spacing:.1px;
+  text-transform:none;margin-bottom:6px;}
+
+/* El campo se ve como campo aun sin foco: fondo apenas teñido y borde
+   suave. Al enfocar pasa a blanco -- se "abre" -- con anillo cian. */
+.barra-filtros .form-control, .barra-filtros .form-select,
+#panelFiltros .form-control, #panelFiltros .form-select{
+  border-radius:9px;border:1px solid #DDE3EC;background-color:#FBFCFE;
+  font-size:13.5px;font-weight:500;color:var(--navy-900);
+  padding:8px 12px;height:auto;line-height:1.35;transition:all .15s ease;}
+.barra-filtros .form-control::placeholder, #panelFiltros .form-control::placeholder{
+  color:#9AA5B5;font-weight:400;}
+.barra-filtros .form-control:hover, .barra-filtros .form-select:hover,
+#panelFiltros .form-control:hover, #panelFiltros .form-select:hover{border-color:#C3CEDD;}
+.barra-filtros .form-control:focus, .barra-filtros .form-select:focus,
+#panelFiltros .form-control:focus, #panelFiltros .form-select:focus{
+  background-color:#fff;border-color:var(--cian-500);
+  box-shadow:0 0 0 3px rgba(0,143,213,.16);}
+/* Flecha propia en los desplegables: la de fabrica es de otro sistema. */
+.barra-filtros .form-select, #panelFiltros .form-select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235B6675' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-size:13px;background-position:right 11px center;padding-right:32px;}
+/* Un campo con algo escrito se distingue de uno vacio sin tener que leerlo. */
+.barra-filtros .form-select:not([value=""]):valid{color:var(--navy-900);}
+/* Un manifiesto son seis digitos y una placa seis caracteres: los campos
+   se ajustan a eso en vez de estirarse y quitarle sitio al cliente. */
+.campo-manif{width:112px;}
+.campo-placa{width:104px;text-transform:uppercase;}
+.campo-placa::placeholder{text-transform:none;}
+
+/* Insignia del boton Filtros. Vacia no ocupa nada: un "0" permanente se
+   vuelve parte del boton y deja de leerse. */
+.contador{display:none;}
+.contador.hay{display:inline-flex;align-items:center;justify-content:center;
+              min-width:19px;height:19px;padding:0 6px;margin-left:7px;
+              border-radius:10px;background:#fff;color:var(--navy-800);
+              font-size:11px;font-weight:700;line-height:1;}
+
+/* La franja de lo filtrado. Con trece filtros en un panel cerrado, esto
+   es lo unico que impide leer un informe recortado creyendolo completo. */
+.franja-chips{display:flex;flex-wrap:wrap;align-items:center;gap:7px;min-height:30px;}
+.franja-chips .rotulo-chips{font-size:10px;font-weight:700;text-transform:uppercase;
+                            letter-spacing:.9px;color:var(--gris-rotulo);
+                            display:flex;align-items:center;gap:6px;margin-right:2px;}
+.franja-chips .rotulo-chips svg{display:block;}
+
+.chip-filtro{display:inline-flex;align-items:center;gap:7px;background:#fff;
+             border:1px solid #DDE3EC;border-radius:20px;padding:4px 5px 4px 12px;
+             white-space:nowrap;box-shadow:0 1px 2px rgba(11,37,69,.05);}
+.chip-filtro .et{font-size:9.5px;font-weight:700;text-transform:uppercase;
+                 letter-spacing:.7px;color:var(--gris-rotulo);}
+.chip-filtro .vl{font-size:12.5px;font-weight:600;color:var(--navy-800);}
+.chip-filtro .x{border:0;background:none;width:19px;height:19px;border-radius:50%;
+                display:flex;align-items:center;justify-content:center;padding:0;
+                color:var(--gris-600);cursor:pointer;transition:all .12s ease;}
+.chip-filtro .x:hover{background:var(--c-rojo);color:#fff;}
+.chip-filtro .x svg{display:block;}
+
+.limpiar-todo{border:0;background:none;padding:3px 9px;border-radius:20px;
+              font-size:12px;font-weight:600;color:var(--gris-600);cursor:pointer;}
+.limpiar-todo:hover{background:var(--c-rojo-f);color:var(--c-rojo-t);}
+.tabla-rebate{font-size:.8rem;}
+.tabla-rebate thead th{position:sticky;top:0;z-index:2;white-space:nowrap;font-size:.7rem;}
+.tabla-rebate td{white-space:nowrap;}
+.tabla-rebate td.num{text-align:right;font-variant-numeric:tabular-nums;}
+/* Hover apenas perceptible; la seleccion, un poco mas marcada pero
+   igual de clara: la fila hay que poder LEERLA mientras se sigue de
+   punta a punta, y un fondo oscuro obliga a cambiar el color del texto y
+   pelea con las celdas que ya tienen color propio. */
+.tabla-rebate tbody tr:hover{background:var(--cian-050);}
+.tabla-rebate tbody tr.fila-sel,
+.tabla-rebate tbody tr.fila-sel:hover{background:var(--cian-100);}
+/* La marca de la izquierda es lo que permite ubicar la fila cuando se
+   vuelve del extremo derecho de la tabla. */
+.tabla-rebate tbody tr.fila-sel > td:first-child{box-shadow:inset 3px 0 0 var(--cian-500);}
+.tabla-rebate tbody tr.fila-sel > td{border-top-color:var(--cian-400);
+                                     border-bottom-color:var(--cian-400);}
+.tabla-rebate tbody tr{cursor:pointer;}
+
+/* Cuando cambia el cliente, la fila arranca con una linea marcada: con
+   veinticuatro mil lineas seguidas no hay forma de ver donde termina uno
+   y empieza otro. Se nota mas al ordenar por cliente, que es cuando las
+   lineas quedan agrupadas de verdad. */
+.tabla-rebate tbody tr.corte-cliente > td{border-top:2px solid #A9BACE;}
+.tabla-rebate tbody tr.corte-cliente > td:first-child{
+  box-shadow:inset 4px 0 0 var(--navy-700);}
+.tabla-rebate tbody tr.corte-cliente.fila-sel > td:first-child{
+  box-shadow:inset 4px 0 0 var(--cian-500);}
+/* Las celdas con color propio se aclaran sobre la fila seleccionada para
+   que no se pierdan ni la tapen. */
+.tabla-rebate tbody tr.fila-sel td.util-real{background:#C9E4F5;}
+.marco-tabla{max-height:65vh;overflow:auto;border:1px solid var(--gris-300);border-radius:8px;}
+.pill-si{background:#1c7c40;color:#fff;border-radius:10px;padding:0 7px;font-size:.7rem;}
+.pill-no{background:var(--gris-600);color:#fff;border-radius:10px;padding:0 7px;font-size:.7rem;}
+.meta{font-size:.78rem;color:var(--gris-600);}
+
+/* =====================================================================
+   Tarjetas de indicador
+
+   El filete de color va ARRIBA y dice de que categoria habla la cifra.
+   Antes era un borde izquierdo de 4 px que se leia como decoracion; asi
+   se lee como clasificacion, que es lo que es.
+   ===================================================================== */
+.kpi{background:#fff;border-radius:14px;height:100%;overflow:hidden;
+     box-shadow:0 1px 3px rgba(11,37,69,.10), 0 1px 2px rgba(11,37,69,.06);
+     display:flex;flex-direction:column;}
+.kpi .filete{height:4px;flex:none;background:var(--c-navy);}
+.kpi .contenido{padding:9px 15px 12px;display:flex;flex-direction:column;flex:1;}
+/* El rotulo dice QUE se esta mirando: con dieciseis tarjetas en pantalla
+   es lo primero que hay que poder leer, y en gris de 10 px se perdia.
+   Va en el azul oscuro de la marca, mas grande y mas pesado, con una
+   marca de color al frente que repite la categoria del filete a la altura
+   del texto -- que es donde el ojo aterriza, no en el borde de arriba.
+   La CIFRA sigue siendo la unica que lleva el color de la categoria: si
+   el rotulo tambien se pintara de color, la tarjeta quedaria de un solo
+   tono y se perderia cual de los dos manda. */
+.kpi .rotulo{font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;
+             color:var(--navy-800);font-weight:800;line-height:1.25;
+             display:flex;align-items:center;gap:7px;}
+.kpi .rotulo::before{content:'';flex:none;width:4px;height:13px;
+                     border-radius:2px;background:var(--c-navy);}
+.kpi .valor{font-family:var(--cifras);font-variant-numeric:tabular-nums;
+            font-weight:700;font-size:21px;letter-spacing:-.4px;
+            line-height:1.15;margin-top:4px;white-space:nowrap;color:var(--navy-800);}
+.kpi .valor.sm{font-size:18px;}
+.kpi .valor.xs{font-size:15px;letter-spacing:-.3px;}
+/* El denominador en gris: la parte y el todo se distinguen sin leer. */
+.kpi .valor .de{color:#94A3B8;font-size:.72em;}
+
+/* El pie y la insignia comparten renglon en vez de apilarse. Son dos
+   datos cortos: puestos uno debajo del otro costaban 28 px por tarjeta,
+   que en catorce tarjetas es media pantalla. */
+.kpi .linea-pie{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;}
+.kpi .pie{font-size:11px;color:var(--gris-600);line-height:1.35;flex:1;min-width:0;}
+/* Cuando el pie es la MISMA cifra en otra unidad (kilos arriba, toneladas
+   abajo) no es una leyenda sino un segundo numero: se pinta mas grande y
+   con las cifras alineadas para poder leerlo como tal. */
+.kpi .pie.cifra{font-size:13px;font-weight:700;color:var(--navy-700);
+                font-variant-numeric:tabular-nums;letter-spacing:-.1px;
+                /* Una cifra no se parte en dos renglones ni se deja recortar
+                   por la pastilla: conserva su ancho (flex:0 0 auto) y es la
+                   pastilla la que baja de renglon, que linea-pie ya envuelve. */
+                white-space:nowrap;flex:0 0 auto;}
+.kpi .insignia{display:inline-block;font-size:10px;font-weight:700;flex:none;
+               border-radius:20px;padding:2px 9px;letter-spacing:.2px;
+               background:var(--c-navy-f);color:var(--c-navy-t);}
+.kpi.cargando .valor{color:var(--gris-300);font-size:14px;letter-spacing:0;}
+
+/* Cada categoria pinta filete, marca del rotulo, cifra e insignia. */
+.kpi.azul  .filete{background:var(--c-azul);}
+.kpi.azul  .rotulo::before{background:var(--c-azul);}
+.kpi.azul  .valor{color:var(--c-azul-t);}
+.kpi.azul  .insignia{background:var(--c-azul-f);color:var(--c-azul-t);}
+.kpi.rojo  .filete{background:var(--c-rojo);}
+.kpi.rojo  .rotulo::before{background:var(--c-rojo);}
+.kpi.rojo  .valor{color:var(--c-rojo-t);}
+.kpi.rojo  .insignia{background:var(--c-rojo-f);color:var(--c-rojo-t);}
+.kpi.cian  .filete{background:var(--c-cian);}
+.kpi.cian  .rotulo::before{background:var(--c-cian);}
+.kpi.cian  .valor{color:var(--c-cian-t);}
+.kpi.cian  .insignia{background:var(--c-cian-f);color:var(--c-cian-t);}
+.kpi.ambar .filete{background:var(--c-ambar);}
+.kpi.ambar .rotulo::before{background:var(--c-ambar);}
+.kpi.ambar .valor{color:var(--c-ambar-t);}
+.kpi.ambar .insignia{background:var(--c-ambar-f);color:var(--c-ambar-t);}
+.kpi.verde .filete{background:var(--c-verde);}
+.kpi.verde .rotulo::before{background:var(--c-verde);}
+.kpi.verde .valor{color:var(--c-verde-t);}
+.kpi.verde .insignia{background:var(--c-verde-f);color:var(--c-verde-t);}
+
+/* Barra de progreso: al pie, delgada, del color de la categoria. */
+.kpi .barra{height:5px;border-radius:3px;background:#E7ECF3;margin-top:auto;
+            padding-top:0;overflow:hidden;}
+.kpi .barra i{display:block;height:100%;border-radius:3px;background:var(--c-navy);
+              transition:width .35s ease;}
+.kpi.azul  .barra i{background:var(--c-azul);}
+.kpi.rojo  .barra i{background:var(--c-rojo);}
+.kpi.rojo  .barra{background:#F7DDDE;}
+.kpi.cian  .barra i{background:var(--c-cian);}
+.kpi.ambar .barra i{background:var(--c-ambar);}
+.kpi.verde .barra i{background:var(--c-verde);}
+/* Un espacio entre la barra y lo de arriba, sin empujar cuando no hay. */
+.kpi .barra{margin-top:8px;}
+.kpi .contenido > .barra:not(:first-child){margin-top:8px;}
+
+/* =====================================================================
+   Panel de analisis (details/summary) y grafico de barras
+
+   Cerrado ocupa un renglon. El "+" gira a "×" al abrir -- el mismo signo
+   que lo abrio es el que lo cierra, y girarlo lo dice sin texto.
+   ===================================================================== */
+.panel-analisis{background:#fff;border:1px solid var(--gris-300);border-radius:12px;
+                margin:0 0 16px;overflow:hidden;}
+.panel-analisis > summary{list-style:none;cursor:pointer;display:flex;align-items:center;
+                          gap:11px;padding:11px 16px;user-select:none;}
+.panel-analisis > summary::-webkit-details-marker{display:none;}
+.panel-analisis > summary:hover{background:var(--cian-050);}
+.panel-analisis > summary:focus-visible{outline:2px solid var(--cian-500);outline-offset:-2px;}
+/* El signo se dibuja con dos barras y no con un caracter: asi queda del
+   mismo grosor en cualquier tipografia y gira limpio. */
+.panel-analisis .mas{position:relative;width:20px;height:20px;flex:none;border-radius:6px;
+                     background:var(--navy-100);transition:transform .18s ease, background .18s ease;}
+.panel-analisis .mas::before,
+.panel-analisis .mas::after{content:'';position:absolute;top:50%;left:50%;background:var(--navy-700);
+                            transform:translate(-50%,-50%);border-radius:1px;}
+.panel-analisis .mas::before{width:10px;height:2px;}
+.panel-analisis .mas::after{width:2px;height:10px;transition:opacity .18s ease;}
+.panel-analisis[open] .mas{transform:rotate(135deg);background:var(--cian-100);}
+.panel-analisis .rot{font-size:13px;font-weight:800;color:var(--navy-800);
+                     text-transform:uppercase;letter-spacing:.8px;}
+.panel-analisis .pista-sum{font-size:11.5px;color:var(--gris-rotulo);}
+.panel-analisis .cuerpo-analisis{padding:4px 18px 18px;border-top:1px solid #EDF0F4;}
+/* La tabla trae su propio marco con borde y esquinas: adentro del panel
+   necesita menos aire alrededor que un grafico. */
+.panel-analisis.tabla-plegada .cuerpo-analisis{padding:12px 14px 14px;}
+.panel-analisis.tabla-plegada .cuerpo-analisis .marco-tabla{max-height:62vh;}
+
+.gr-cab{display:flex;align-items:baseline;justify-content:space-between;gap:14px;
+        flex-wrap:wrap;margin:14px 0 12px;}
+.gr-cab h3{margin:0;font-size:15px;font-weight:800;color:var(--navy-800);letter-spacing:-.2px;}
+.gr-nota{font-size:11px;color:var(--gris-600);font-variant-numeric:tabular-nums;}
+.gr-vacio{font-size:12px;color:var(--gris-600);margin:6px 2px;}
+.gr-vacio.error{color:var(--c-rojo-t);}
+
+/* Barras horizontales. Una sola serie, un solo color: aqui el color no
+   identifica a nadie, solo dibuja la magnitud. El rotulo y la cifra van en
+   tinta de texto, nunca del color de la barra. */
+.grafico-barras{display:flex;flex-direction:column;gap:2px;}
+.gr-fila{display:grid;grid-template-columns:minmax(120px,300px) 1fr auto;
+         align-items:center;gap:12px;padding:3px 6px;border-radius:6px;}
+.gr-fila:hover{background:var(--cian-050);}
+.gr-nom{font-size:11.5px;font-weight:600;color:var(--navy-800);
+        white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gr-pista{height:14px;background:var(--gris-050);border-radius:3px;min-width:40px;}
+.gr-pista i{display:block;height:100%;background:var(--cian-500);
+            /* Extremo redondeado solo del lado del dato; el otro queda a
+               ras de la linea de base, que es de donde arranca la medida. */
+            border-radius:0 4px 4px 0;min-width:2px;}
+.gr-val{font-size:12px;font-weight:800;color:var(--navy-800);
+        font-variant-numeric:tabular-nums;white-space:nowrap;
+        display:flex;align-items:baseline;gap:7px;}
+.gr-val .gr-pc{font-size:10.5px;font-weight:600;color:var(--gris-rotulo);
+               min-width:38px;text-align:right;}
+/* "Otros" no es un cliente: gris, para que no se lea como uno mas. */
+.gr-fila.otros .gr-nom{color:var(--gris-600);font-style:italic;}
+.gr-fila.otros .gr-pista i{background:var(--gris-300);}
+.gr-fila.otros .gr-val{color:var(--gris-600);}
+@media (max-width:700px){
+  .gr-fila{grid-template-columns:1fr auto;gap:4px 10px;}
+  .gr-nom{grid-column:1 / -1;}
+  .gr-pista{grid-column:1;}
+}
+
+/* =====================================================================
+   Cumplimiento por agencia  (matriz)
+
+   Cinco columnas y una celda por indicador: el porcentaje grande manda y
+   el detalle va debajo en pequeño. El color pinta la celda ENTERA, no
+   solo el numero: asi el mapa de rojos y verdes se lee de lejos, que es
+   para lo que sirve este panel -- ver de un golpe que agencia esta corta.
+   ===================================================================== */
+/* Encabezado del panel. Este lleva titulo de verdad y no el rotulo
+   diminuto de las otras secciones: no es una fila mas de indicadores, es
+   un informe aparte -- lo real contra el presupuesto -- y necesita
+   anunciarse como tal y llevar su leyenda al lado. */
+.cab-agencias{display:flex;align-items:flex-end;justify-content:space-between;
+              gap:18px;flex-wrap:wrap;margin:26px 2px 10px;}
+.titulo-panel{font-size:28px;font-weight:800;color:var(--navy-800);
+              letter-spacing:-.6px;line-height:1.15;margin:0;}
+@media (max-width:900px){ .titulo-panel{font-size:23px;letter-spacing:-.4px;} }
+.nota-seccion{font-size:11.5px;font-weight:600;letter-spacing:.1px;
+              color:var(--gris-600);margin-top:3px;}
+
+/* Leyenda del semaforo. El cuadro lleva el MISMO relleno de la celda y
+   borde del color fuerte: pintado a color pleno no se pareceria a lo que
+   hay que reconocer en la tabla, que es lo unico que tiene que hacer. */
+.leyenda-semaforo{display:flex;flex-wrap:wrap;gap:8px 16px;padding-bottom:3px;}
+.leyenda-semaforo .lg{display:inline-flex;align-items:center;gap:7px;
+                      font-size:11px;font-weight:600;color:var(--gris-600);white-space:nowrap;}
+.leyenda-semaforo .lg i{width:13px;height:13px;border-radius:3px;flex:none;}
+.leyenda-semaforo .cumple i{background:var(--c-verde-f);border:1px solid var(--c-verde);}
+.leyenda-semaforo .cerca  i{background:var(--c-ambar-f);border:1px solid var(--c-ambar);}
+.leyenda-semaforo .falla  i{background:var(--c-rojo-f); border:1px solid var(--c-rojo);}
+.leyenda-semaforo .nula   i{background:#fff;border:1px solid var(--gris-300);}
+.marco-agencias{border:1px solid var(--gris-300);border-radius:8px;overflow:auto;background:#fff;}
+/* Ancho fijo (los porcentajes van en el colgroup de la vista) y un minimo:
+   por debajo de eso el marco desplaza en vez de apretar las celdas. */
+.tabla-agencias{font-size:12.5px;margin:0;table-layout:fixed;min-width:1080px;}
+.tabla-agencias thead th{background:var(--navy-100);color:var(--navy-800);font-weight:800;
+                         font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;
+                         border-bottom:1px solid var(--gris-300);vertical-align:middle;
+                         padding:8px 12px;white-space:nowrap;text-align:center;}
+.tabla-agencias thead th.ag{text-align:left;}
+.tabla-agencias thead th.num{text-align:right;}
+.tabla-agencias td{padding:9px 12px;border-top:1px solid #EDF0F4;vertical-align:middle;}
+.tabla-agencias td.ag{font-weight:700;color:var(--navy-800);white-space:nowrap;}
+.tabla-agencias span.sub{display:block;font-size:10.5px;font-weight:500;
+                     color:var(--gris-rotulo);font-variant-numeric:tabular-nums;}
+
+/* La celda de la matriz. */
+.tabla-agencias td.mz{text-align:right;border-left:1px solid var(--gris-300);}
+.tabla-agencias td.mz b{display:block;font-size:19px;font-weight:800;line-height:1.1;
+                        font-variant-numeric:tabular-nums;letter-spacing:-.3px;}
+/* El detalle "real de meta" es la cifra que se lee cuando el porcentaje
+   ya llamo la atencion, asi que no puede ser letra de pie de pagina: va a
+   12,5 px y en semi-negrilla, el mismo cuerpo del resto de la tabla. */
+.tabla-agencias td.mz span{display:block;font-size:12.5px;font-weight:600;
+                           color:var(--navy-800);margin-top:3px;
+                           font-variant-numeric:tabular-nums;white-space:nowrap;}
+/* La meta, dentro del detalle, mas apagada: es la referencia, no el dato. */
+/* La meta, dentro del detalle, mas apagada y sin negrilla: al crecer el
+   renglon hay que poder distinguir de un vistazo cual de los dos numeros
+   es lo REAL y cual la referencia. */
+.tabla-agencias td.mz em{font-style:normal;font-weight:500;color:var(--gris-600);}
+.tabla-agencias td.mz.cumple{background:var(--c-verde-f);}
+.tabla-agencias td.mz.cumple b{color:var(--c-verde-t);}
+.tabla-agencias td.mz.cerca{background:var(--c-ambar-f);}
+.tabla-agencias td.mz.cerca b{color:var(--c-ambar-t);}
+.tabla-agencias td.mz.falla{background:var(--c-rojo-f);}
+.tabla-agencias td.mz.falla b{color:var(--c-rojo-t);}
+/* Sin meta no se pinta nada: el gris dice "no aplica" y un color diria
+   que la agencia cumplio o fallo, que son dos afirmaciones distintas. */
+.tabla-agencias td.mz.sin-meta b{color:var(--gris-300);}
+
+/* La utilidad por tonelada es una cifra de la misma jerarquia que los
+   porcentajes: mismo cuerpo y mismo peso, y su meta debajo con el mismo
+   tratamiento que el detalle de las otras columnas. Mas pequeña se leia
+   como una nota al margen y no como la cuarta medida que es. */
+/* El TOTAL no es una agencia mas: se separa con una franja del color del
+   fondo -- un corte de verdad, no una raya -- y encima la linea navy, que
+   se dibuja con box-shadow porque una celda no admite dos bordes en el
+   mismo lado. Tambien respira mas arriba y abajo. */
+.tabla-agencias tr.total td{border-top:11px solid var(--fondo);
+                            box-shadow:inset 0 3px 0 var(--navy-700);
+                            padding-top:13px;padding-bottom:12px;
+                            font-weight:800;color:var(--navy-800);}
+.tabla-agencias tr.total td.ag{background:var(--gris-050);}
+/* La palabra TOTAL en versalitas y separada: se lee como rotulo de cierre
+   y no como el nombre de otra agencia. */
+.tabla-agencias tr.total td.ag{font-size:13px;text-transform:uppercase;letter-spacing:1px;}
+/* El conteo de manifiestos no es rotulo: se queda en caja normal. */
+.tabla-agencias tr.total td.ag span.sub{text-transform:none;letter-spacing:0;}
+.tabla-agencias tr:not(.total):hover td.ag{background:var(--cian-050);}
+.pie-agencias{font-size:11px;color:var(--gris-600);margin:8px 2px 24px;line-height:1.5;}
+
+/* ---------------------------------------------------------------------
+   La misma tabla en pantalla angosta.
+
+   Debajo de 820 px no caben cinco columnas con un porcentaje grande y su
+   detalle: o queda un marco que hay que desplazar a mano -- y el que
+   consulta desde el telefono no lo desplaza, se queda con las dos
+   primeras columnas y cree que eso es todo --, o se aprietan las cifras
+   hasta que se parten. Asi que cada agencia deja de ser una fila y pasa a
+   ser una TARJETA: el nombre arriba y las cuatro medidas en dos por dos.
+   Es la misma lectura, sin barra horizontal.
+
+   El encabezado se esconde y cada celda se nombra sola con data-rotulo.
+   Sin eso quedan cuatro cifras sueltas sin decir de que son, que es el
+   error clasico de convertir una tabla en tarjetas.
+   --------------------------------------------------------------------- */
+@media (max-width:820px){
+  .marco-agencias{border:0;border-radius:0;background:transparent;overflow:visible;}
+  .tabla-agencias{display:block;min-width:0;table-layout:auto;}
+  .tabla-agencias colgroup, .tabla-agencias thead{display:none;}
+  .tabla-agencias tbody{display:block;}
+  .tabla-agencias tr{display:grid;grid-template-columns:1fr 1fr;
+                     border:1px solid var(--gris-300);border-radius:9px;
+                     overflow:hidden;background:#fff;margin-bottom:10px;}
+  /* El aviso de "Calculando…" o de error ocupa la tarjeta entera. */
+  .tabla-agencias td[colspan]{grid-column:1 / -1;}
+
+  /* Cabecera de la tarjeta: nombre a la izquierda, manifiestos a la
+     derecha, en el mismo renglon. */
+  .tabla-agencias td.ag{grid-column:1 / -1;background:var(--navy-100);
+                        border-top:0;padding:9px 12px;font-size:14px;
+                        display:flex;align-items:baseline;gap:10px;
+                        justify-content:space-between;}
+  .tabla-agencias span.sub{display:inline;}
+
+  .tabla-agencias td.mz{text-align:left;border-left:0;
+                        border-top:1px solid var(--gris-300);padding:9px 12px;}
+  /* Las celdas impares son las de la derecha (la primera es la cabecera,
+     que ocupa las dos): ahi va la raya que divide la pareja. */
+  .tabla-agencias td.mz:nth-child(odd){border-left:1px solid var(--gris-300);}
+  .tabla-agencias td.mz::before{content:attr(data-rotulo);display:block;
+                        font-size:9.5px;font-weight:800;text-transform:uppercase;
+                        letter-spacing:.5px;color:var(--gris-600);margin-bottom:3px;}
+  .tabla-agencias td.mz b{font-size:20px;}
+  /* En tarjeta el detalle si puede partirse en dos renglones: hay sitio
+     de sobra hacia abajo y ninguno hacia el lado. */
+  .tabla-agencias td.mz span{white-space:normal;font-size:12px;}
+
+  /* El TOTAL es otra tarjeta, y se marca con borde navy en vez de la
+     franja de separacion: entre tarjetas ya hay aire, lo que falta es
+     decir que esta no es una agencia mas. */
+  .tabla-agencias tr.total{border:2px solid var(--navy-700);}
+  .tabla-agencias tr.total td{border-top:1px solid var(--gris-300);box-shadow:none;
+                              padding-top:9px;padding-bottom:9px;}
+  .tabla-agencias tr.total td.ag{background:var(--navy-700);color:#fff;border-top:0;}
+  .tabla-agencias tr.total td.ag span.sub{color:rgba(255,255,255,.78);}
+}
+
+/* Telefono estrecho: dos columnas de cifras grandes ya no caben. Una sola
+   columna, cada medida en su renglon, que sigue siendo mas legible que
+   una tabla encogida. */
+@media (max-width:430px){
+  .tabla-agencias tr{grid-template-columns:1fr;}
+  .tabla-agencias td.mz:nth-child(odd){border-left:0;}
+  .tabla-agencias td.ag{flex-wrap:wrap;gap:2px 10px;}
+}
+
+/* =====================================================================
+   Pantalla de acceso a Condiciones
+   ===================================================================== */
+.pantalla-acceso{min-height:100vh;display:flex;align-items:center;justify-content:center;
+                 background:var(--navy-800);padding:20px;}
+.caja-acceso{background:#fff;border-radius:12px;padding:32px 30px 24px;width:100%;
+             max-width:380px;box-shadow:0 10px 30px rgba(8,25,46,.35);text-align:center;}
+.caja-acceso .logo{height:44px;margin-bottom:18px;}
+.caja-acceso h1{font-size:1.15rem;font-weight:700;color:var(--navy-800);margin-bottom:6px;}
+.caja-acceso .explica{font-size:.84rem;color:var(--gris-600);margin-bottom:18px;line-height:1.4;}
+.caja-acceso form{text-align:left;}
+.caja-acceso .volver{display:inline-block;margin-top:18px;font-size:.8rem;
+                     color:var(--gris-600);text-decoration:none;}
+.caja-acceso .volver:hover{color:var(--cian-600);}
+
+/* =====================================================================
+   Rutas de una condicion
+
+   Una regla migrada del DAX puede traer diez pares origen-destino. En
+   linea seguida eso es un muro de fichas que nadie lee. Se agrupan por
+   origen -- que es como estan escritas las condiciones de verdad -- y se
+   muestran las dos primeras; el resto se despliega.
+   ===================================================================== */
+.rutas{display:flex;flex-direction:column;gap:3px;}
+.ruta-linea{display:flex;align-items:baseline;gap:6px;font-size:.78rem;line-height:1.35;}
+.ruta-linea .origen{font-weight:600;color:var(--navy-800);white-space:nowrap;}
+.ruta-linea .flecha-ruta{color:var(--gris-600);}
+.ruta-linea .destinos{color:var(--navy-900);}
+.ruta-linea.excluida{color:#B4232A;}
+.ruta-linea.excluida .origen{color:#B4232A;}
+.ruta-linea.excluida::before{content:"no aplica";font-size:.66rem;text-transform:uppercase;
+                             letter-spacing:.4px;background:#FDECEC;border:1px solid #E9A8AB;
+                             color:#8C1A20;border-radius:8px;padding:0 5px;margin-right:2px;}
+.mas-rutas{border:0;background:none;padding:0;font-size:.74rem;font-weight:600;
+           color:var(--cian-600);cursor:pointer;text-align:left;}
+.mas-rutas:hover{text-decoration:underline;}
+/* El asterisco marca coincidencia parcial: *CARTAGENA* calza con
+   "CARTAGENA BOSQUE". Se distingue del texto para que no se lea como
+   parte del nombre del municipio. */
+.comodin{color:var(--cian-600);font-weight:700;}
+
+/* Tarjetas que ademas filtran la tabla. */
+.kpi.pulsable{cursor:pointer;transition:box-shadow .15s ease, transform .15s ease;}
+.kpi.pulsable:hover{box-shadow:0 6px 18px rgba(11,37,69,.16);transform:translateY(-2px);}
+.kpi.pulsable:focus-visible{outline:2px solid var(--cian-500);outline-offset:2px;}
+.kpi .accion{margin-top:7px;font-size:10px;font-weight:700;color:var(--cian-600);
+             text-transform:uppercase;letter-spacing:.5px;}
+.kpi.rojo  .accion{color:var(--c-rojo-t);}
+.kpi.verde .accion{color:var(--c-verde-t);}
+.kpi.azul  .accion{color:var(--c-azul-t);}
+/* Con el filtro puesto la tarjeta queda marcada: si no, quedaria una
+   tabla filtrada sin nada que recuerde por que. */
+.kpi.filtrada{box-shadow:0 0 0 2px var(--cian-500), 0 4px 14px rgba(11,37,69,.14);}
+.kpi.filtrada .accion{color:var(--navy-800);}
+
+/* =====================================================================
+   Panel de filtros
+
+   Es la mitad de los filtros de la plataforma y estaba con el estilo de
+   fabrica de Bootstrap: se veia como una ventana ajena pegada encima.
+   Ahora lleva la misma banda del encabezado y los mismos rotulos de
+   seccion que el resto.
+   ===================================================================== */
+#panelFiltros{width:400px;border:0;}
+#panelFiltros .offcanvas-header{
+  background:linear-gradient(100deg,#08192E 0%,var(--navy-800) 40%,var(--cian-600) 100%);
+  color:#fff;padding:16px 22px;border:0;align-items:flex-start;}
+#panelFiltros .offcanvas-title{font-size:18px;font-weight:700;letter-spacing:-.2px;}
+#panelFiltros .cabecera-sub{font-size:11px;font-weight:700;letter-spacing:1.4px;
+                            color:#B6DDF2;text-transform:uppercase;margin-bottom:3px;}
+#panelFiltros .btn-close{filter:invert(1) grayscale(1) brightness(2);opacity:.85;margin-top:4px;}
+#panelFiltros .btn-close:hover{opacity:1;}
+#panelFiltros .offcanvas-body{padding:0 22px 96px;background:#fff;}
+
+/* Grupo: rotulo con filete corto encima, como las secciones del informe. */
+.grupo-filtro{padding:20px 0 4px;}
+.grupo-filtro + .grupo-filtro{border-top:1px solid #EDF1F6;}
+.titulo-grupo{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;
+              font-weight:700;color:var(--gris-rotulo);margin-bottom:12px;
+              display:flex;align-items:center;gap:9px;}
+.titulo-grupo::before{content:"";width:18px;height:3px;border-radius:2px;
+                      background:var(--cian-500);flex:none;}
+
+#panelFiltros .form-label{font-size:10.5px;font-weight:700;text-transform:uppercase;
+                          letter-spacing:.6px;color:var(--gris-600);margin-bottom:5px;}
+#panelFiltros .form-control, #panelFiltros .form-select{
+  border-radius:8px;border-color:#DDE3EC;padding:7px 11px;font-size:13px;}
+#panelFiltros .form-control:focus, #panelFiltros .form-select:focus{
+  border-color:var(--cian-500);box-shadow:0 0 0 3px rgba(0,143,213,.15);}
+
+/* La advertencia del 2,7% en caja propia: es una consecuencia (tarda
+   mas), no una etiqueta de campo, y como texto suelto no se lee. */
+.nota-grupo{font-size:12px;color:#6B5A1E;line-height:1.5;margin:0 0 12px;
+            background:var(--c-ambar-f);border-left:3px solid var(--c-ambar);
+            border-radius:0 8px 8px 0;padding:9px 12px;}
+
+/* Pie fijo: las acciones no se van con el desplazamiento. */
+.pie-panel{position:absolute;left:0;right:0;bottom:0;background:#fff;
+           border-top:1px solid #EDF1F6;padding:14px 22px;display:flex;gap:10px;
+           align-items:center;box-shadow:0 -6px 16px rgba(11,37,69,.06);}
+.pie-panel .btn{flex:1;}
+.pie-panel .limpiar{border:0;background:none;padding:0 4px;font-size:12.5px;
+                    font-weight:600;color:var(--gris-600);cursor:pointer;white-space:nowrap;}
+.pie-panel .limpiar:hover{color:var(--c-rojo-t);}
+
+/* =====================================================================
+   RESTAURADO — se perdio al rehacer la hoja de estilos.
+   Todo esto ya existia; vuelve con la piel nueva.
+   ===================================================================== */
+
+/* --- marcas dentro de la tabla --- */
+.tabla-rebate th.orden{cursor:pointer;user-select:none;}
+.tabla-rebate th.orden:hover{background:var(--navy-800);}
+.tabla-rebate th.orden .flecha{opacity:.9;font-size:.85em;}
+.tabla-rebate th.orden.activa{background:var(--cian-600);}
+.tabla-rebate td.final{font-weight:700;color:var(--navy-800);}
+/* Una linea sin condicion no es un cero cualquiera: es "no aplica nada". */
+.tabla-rebate td.sin-regla{color:#A8B2C1;}
+/* El valor fijo del manifiesto vive en su primera linea; en las demas no
+   hay valor propio, y una raya lo dice mejor que un cero. */
+.tabla-rebate td.celda-nd{color:#A8B2C1;cursor:help;}
+/* Faltante: kilos que se cargaron y no llegaron. En rojo, porque es
+   perdida. El sobrante -- descargo mas de lo que cargo -- va en azul y no
+   en verde: no es una ganancia, es una discrepancia de bascula que
+   tambien hay que revisar. */
+.tabla-rebate td.hay-faltante{color:var(--c-rojo-t);font-weight:700;}
+.tabla-rebate td.hay-sobrante{color:var(--c-azul-t);font-weight:600;cursor:help;}
+.tabla-rebate td.bono-ajustado{cursor:help;position:relative;
+                               box-shadow:inset 0 -2px 0 var(--c-ambar);}
+/* Los items de esta remesa salieron en facturas distintas. */
+.tabla-rebate .marca-split{display:inline-block;margin-left:5px;color:var(--cian-600);
+                           font-size:.9em;cursor:help;}
+.modo-completo{color:var(--cian-600);font-weight:600;}
+
+/* --- estado del listado de afiliados --- */
+.chip-afiliados{display:inline-flex;align-items:center;border-radius:20px;
+                padding:4px 13px;font-size:11.5px;font-weight:600;white-space:nowrap;
+                background:rgba(255,255,255,.16);color:#fff;border:1px solid transparent;}
+.chip-afiliados.ok{background:rgba(14,164,122,.28);border-color:#3FD3A3;color:#D8F7EC;}
+.chip-afiliados.aviso{background:rgba(224,185,59,.24);border-color:var(--ambar-400);color:#FBEFC6;}
+.chip-afiliados.alerta{background:var(--c-rojo);border-color:#E4646A;color:#fff;}
+.chip-afiliados:empty{display:none;}
+
+.aviso-afiliados{border-radius:14px;padding:14px 18px;margin-bottom:16px;background:#fff;
+                 display:flex;gap:14px;align-items:flex-start;
+                 box-shadow:0 1px 3px rgba(11,37,69,.10), 0 1px 2px rgba(11,37,69,.06);
+                 border-left:4px solid var(--gris-300);}
+.aviso-afiliados.aviso{border-left-color:var(--ambar-500);background:#FFFCF3;}
+.aviso-afiliados.alerta{border-left-color:var(--c-rojo);background:#FEF7F7;}
+.aviso-afiliados .icono{font-size:19px;line-height:1.2;color:var(--ambar-500);}
+.aviso-afiliados.alerta .icono{color:var(--c-rojo);}
+.aviso-afiliados .titulo{font-weight:700;font-size:14px;color:var(--navy-800);}
+.aviso-afiliados.alerta .titulo{color:var(--c-rojo-t);}
+.aviso-afiliados .texto{font-size:12.5px;color:var(--gris-600);margin-top:3px;line-height:1.5;}
+.aviso-afiliados .tecnico{font-size:11.5px;color:var(--gris-600);margin-top:7px;
+                          background:var(--gris-050);border-radius:7px;padding:6px 9px;
+                          word-break:break-word;}
+.aviso-afiliados .acciones{margin-left:auto;white-space:nowrap;}
+
+/* --- pagina de Condiciones --- */
+/* Dos ambitos, dos pestañas. Cada una es un boton con tres piezas:
+   el nombre, un subtitulo que explica a quien se le descuenta, y el
+   conteo. Con flex-wrap y el subtitulo ocupando el ancho completo, el
+   nombre y el conteo comparten el primer renglon y la explicacion cae
+   debajo -- que era la intencion, y por eso se veian apretujados. */
+.nav-tabs.ambitos{border-bottom:1px solid var(--gris-300);gap:4px;}
+.nav-tabs.ambitos .nav-link{border:0;border-bottom:3px solid transparent;
+                            border-radius:10px 10px 0 0;background:none;
+                            color:var(--gris-600);font-size:14.5px;padding:12px 22px 11px;
+                            display:flex;flex-wrap:wrap;align-items:center;gap:0 10px;
+                            text-align:left;transition:background .15s ease;}
+.nav-tabs.ambitos .nav-link:hover{color:var(--navy-800);background:#EDF2F8;}
+.nav-tabs.ambitos .nav-link strong{font-weight:700;letter-spacing:.2px;}
+/* El subtitulo se lleva el renglon entero: es la explicacion, no un dato. */
+.nav-tabs.ambitos .sub{flex:0 0 100%;font-size:11.5px;color:var(--gris-rotulo);
+                       font-weight:500;margin-top:3px;line-height:1.3;}
+.nav-tabs.ambitos .conteo{background:var(--navy-100);color:var(--navy-700);border-radius:20px;
+                          padding:2px 10px;font-size:12px;font-weight:700;
+                          font-variant-numeric:tabular-nums;margin-left:auto;}
+.nav-tabs.ambitos .nav-link.activa{color:var(--navy-800);border-bottom-color:var(--cian-500);
+                                   background:#fff;font-weight:600;}
+.nav-tabs.ambitos .nav-link.activa .conteo{background:var(--cian-500);color:#fff;}
+.nav-tabs.ambitos .nav-link.activa .sub{color:var(--gris-600);}
+.cuerpo-pestana{border-top-left-radius:0;}
+.badge-cond{display:inline-block;background:var(--navy-100);color:var(--navy-700);
+            border-radius:20px;padding:2px 9px;font-size:11px;font-weight:600;margin:1px 2px;}

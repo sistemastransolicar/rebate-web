@@ -1,0 +1,55 @@
+# =====================================================================
+#  Lo que NUNCA sale de este equipo.
+#
+#  El orden importa: primero lo que rompe seguridad si se publica,
+#  despues lo que solo ensucia el repositorio.
+# =====================================================================
+
+# --- Credenciales -----------------------------------------------------
+# El .env lleva la contrasena de SQL Server y la clave de Condiciones.
+# Si alguna vez llega a subirse, no basta con borrarlo: queda en el
+# historial y hay que cambiar la contrasena.
+.env
+.env.*
+!.env.example
+
+# Llaves de cuentas de servicio, certificados, tokens
+*.pem
+*.key
+*.pfx
+*.p12
+*-key.json
+credencial*.json
+service-account*.json
+client_secret*.json
+
+# --- Dependencias -----------------------------------------------------
+node_modules/
+npm-debug.log*
+package-lock.json.bak
+
+# --- Datos de la operacion -------------------------------------------
+# Listados de afiliados, extractos, exportaciones, respaldos. Son datos
+# de clientes y de terceros: no son codigo y no van a un repositorio.
+*.xlsx
+*.xls
+*.csv
+*.bak
+*.zip
+*.pbix
+exportaciones/
+respaldos/
+
+# --- Registros y temporales ------------------------------------------
+*.log
+logs/
+tmp/
+temp/
+.cache/
+
+# --- Sistema y editores ----------------------------------------------
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/

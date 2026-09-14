@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= titulo %></title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Proxima Nova es una fuente comercial: no se puede empotrar sin licencia.
+     Se usa si esta instalada en el equipo; si no, cae en Montserrat, que es
+     la sustituta libre mas cercana (geometrica, misma epoca, mismo aire). -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="/img/logo-transolicar.png?v=<%= v %>">
+<link href="/css/estilos.css?v=<%= v %>" rel="stylesheet">
+</head>
+<body>
+<header class="banda">
+  <div class="banda-top">
+    <a href="/rebate"><img src="/img/logo-transolicar-blanco.png?v=<%= v %>"
+         alt="Transolicar · Transporte de carga sólida y líquida de Colombia S.A.S"></a>
+    <div class="acciones">
+      <span id="chipAfiliados" class="chip-afiliados" title="Estado del listado de afiliados"></span>
+      <a href="/rebate"  class="btn btn-sm btn-acento">Informe</a>
+      <a href="/reglas"  class="btn btn-sm btn-outline-light">Condiciones</a>
+    </div>
+  </div>
+  <div class="banda-cuerpo">
+    <div>
+      <div class="contexto">Transolicar S.A.S · NIT 900.637.363 · Cía 01 y 02</div>
+      <h1>Informe Rebate</h1>
+      <!-- El periodo y el volumen los escribe el JS con lo que devuelve la
+           consulta: puestos a mano se quedarian mintiendo al primer filtro. -->
+      <div class="periodo" id="bandaPeriodo">&nbsp;</div>
+    </div>
+    <!-- Las dos cifras de volumen. Las escribe el JS con lo que devuelve la
+         consulta rapida, asi que aparecen junto con la tabla y no despues.
+         Un despacho es un manifiesto: un vehiculo despachado. -->
+    <div class="destacado">
+      <div class="dato">
+        <div class="contexto">Despachos</div>
+        <div class="cifra cargando" id="bandaDespachos">…</div>
+      </div>
+      <div class="dato">
+        <div class="contexto">Peso transportado</div>
+        <div class="cifra cargando" id="bandaToneladas">…</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="container-fluid px-4">
+
+  <!-- Aviso del listado de afiliados. Vacio y oculto cuando todo esta bien:
+       una franja que aparece siempre deja de leerse. -->
+  <div id="avisoAfiliados" class="aviso-afiliados" hidden></div>
+
+  <form id="filtros" class="barra-filtros mb-2" autocomplete="off">
+    <div class="row g-2 align-items-end">
+
+      <div class="col-auto">
+        <label class="form-label small mb-1">Desde</label>
+        <input type="date" name="desde" class="form-control form-control-sm" value="<%= desde %>">
+      </div>
+      <div class="col-auto">
+        <label class="form-label small mb-1">Hasta</label>
+        <input type="date" name="hasta" class="form-control form-control-sm" value="<%= hasta %>">
+      </div>
+      <div class="col-auto">
+        <label class="form-label small mb-1 d-block">&nbsp;</label>
+        <div class="d-flex gap-2">
+          <button type="button" class="pastilla" data-rango="mes">Este mes</button>
+          <button type="button" class="pastilla" data-rango="anterior">Mes anterior</button>
+          <button type="button" class="pastilla" data-rango="ano">Todo 2026</button>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-3">
+        <label class="form-label small mb-1">Cliente</label>
+        <input name="cliente" class="form-control form-control-sm" placeholder="nombre o NIT…">
+      </div>
+      <div class="col-auto">
+        <label class="form-label small mb-1">Manifiesto</label>
+        <input name="manif" class="form-control form-control-sm campo-manif"
+               inputmode="numeric" placeholder="número">
+      </div>
+      <div class="col-auto">
+        <label class="form-label small mb-1">Placa</label>
+        <input name="placa" class="form-control form-control-sm campo-placa"
+               placeholder="contiene…" title="Busca mientras escribes: con teclear parte de la placa basta.">
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label small mb-1">Agencia</label>
+        <!-- Se llena al abrir la pantalla con las agencias que realmente
+             despachan (/api/rebate/lista-agencias). Escrito a mano nunca se
+             sabia si "STA MARTA" existia o no: el ERP guarda el nombre
+             cortado a diez letras y la respuesta vacia parecia un error. -->
+        <select name="agencia" id="selAgencia" class="form-select form-select-sm">
+          <option value="">Todas</option>
+        </select>
+      </div>
+
+      <div class="col-auto">
+        <label class="form-label small mb-1 d-block">&nbsp;</label>
+        <button type="button" id="btnFiltros" class="btn btn-navy btn-sm"
+                data-bs-toggle="offcanvas" data-bs-target="#panelFiltros"
+                title="Los demás filtros">
+          Filtros <span id="contadorFiltros" class="contador"></span>
+        </button>
+      </div>
+      <div class="col-auto">
+        <label class="form-label small mb-1 d-block">&nbsp;</label>
+        <button type="button" id="btnExcel" class="btn btn-acento btn-sm"
+                title="Descarga TODAS las líneas que calzan con los filtros, no solo la página que estás viendo.">
+          Exportar a Excel</button>
+      </div>
+    </div>
+
+    <!-- Lo que hay filtrado, siempre a la vista. Sin esto hay que subir a
+         revisar los campos para saber que se esta mirando, y con trece
+         filtros escondidos en un panel eso es garantia de malentendidos. -->
+    <div class="row g-2 mt-1">
+      <div class="col-12 franja-chips">
+        <span id="rotuloChips" class="rotulo-chips" hidden>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+          Filtrado por
+        </span>
+        <span id="chipsFiltros" class="d-flex flex-wrap gap-2"></span>
+        <button type="button" id="btnLimpiar" class="limpiar-todo d-none">Limpiar todo</button>
+        <span class="meta ms-auto" id="meta"></span>
+      </div>
+    </div>
+
+    <!-- El panel vive DENTRO del formulario a proposito: asi sus campos
+         siguen entrando en el FormData y no hay que sincronizar nada. -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="panelFiltros">
+      <div class="offcanvas-header">
+        <div>
+          <div class="cabecera-sub">Acotar el informe</div>
+          <h5 class="offcanvas-title mb-0">Filtros</h5>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+      </div>
+      <div class="offcanvas-body">
+
+        <div class="grupo-filtro">
+          <div class="titulo-grupo">Viaje</div>
+          <div class="row g-2">
+            <div class="col-6">
+              <label class="form-label small mb-1">Cía</label>
+              <select name="idCia" class="form-select form-select-sm">
+                <option value="">Todas</option><option>01</option><option>02</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label small mb-1">Origen</label>
+              <input name="origen" class="form-control form-control-sm" placeholder="contiene…">
+            </div>
+            <div class="col-12">
+              <label class="form-label small mb-1">Destino</label>
+              <input name="destino" class="form-control form-control-sm" placeholder="contiene…">
+            </div>
+          </div>
+        </div>
+
+        <div class="grupo-filtro">
+          <div class="titulo-grupo">Vehículo y poseedor</div>
+          <div class="row g-2">
+            <div class="col-6">
+              <label class="form-label small mb-1">Afiliado</label>
+              <select name="afiliado" class="form-select form-select-sm">
+                <option value="">Todos</option><option>SI</option><option>NO</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label small mb-1">Flota del vehículo</label>
+              <select name="flota" class="form-select form-select-sm">
+                <option value="">Todas</option><option>PROPIO</option><option>TERCEROS</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="grupo-filtro">
+          <div class="titulo-grupo">Estado del viaje</div>
+          <div class="row g-2">
+            <div class="col-4">
+              <label class="form-label small mb-1">ODP</label>
+              <select name="odp" class="form-select form-select-sm">
+                <option value="">Todas</option><option>SI</option><option>NO</option>
+              </select>
+            </div>
+            <div class="col-4">
+              <label class="form-label small mb-1">Cumplido</label>
+              <select name="cumplido" class="form-select form-select-sm">
+                <option value="">Todos</option><option>SI</option><option>NO</option>
+              </select>
+            </div>
+            <div class="col-4">
+              <label class="form-label small mb-1">Facturado</label>
+              <select name="facturado" class="form-select form-select-sm">
+                <option value="">Todos</option><option>SI</option><option>NO</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="grupo-filtro">
+          <div class="titulo-grupo">Descuento de flete</div>
+          <p class="nota-grupo">Tasa efectiva sobre el flete. Entre 2,2 y 3 aísla el
+             descuento general del 2,7%. Este filtro recorre todo el periodo, así que tarda más.</p>
+          <div class="row g-2">
+            <div class="col-6">
+              <label class="form-label small mb-1">% desde</label>
+              <input name="tasaMinPct" type="number" step="0.1" min="0" max="100"
+                     class="form-control form-control-sm" placeholder="2,2">
+            </div>
+            <div class="col-6">
+              <label class="form-label small mb-1">% hasta</label>
+              <input name="tasaMaxPct" type="number" step="0.1" min="0" max="100"
+                     class="form-control form-control-sm" placeholder="3,0">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Las acciones van fijas al pie: con cuatro grupos hay que
+           desplazarse, y un boton que se va con el scroll obliga a
+           volver arriba para cerrar. -->
+      <div class="pie-panel">
+        <button type="button" class="limpiar" id="btnLimpiarPanel">Limpiar filtros</button>
+        <button type="button" class="btn btn-acento" data-bs-dismiss="offcanvas">Ver resultados</button>
+      </div>
+    </div>
+  </form>
+
+  <div class="seccion mt-3">Operación</div>
+  <div id="kpis" class="row g-3 mb-3"></div>
+  <!-- Descuentos y utilidad: llegan aparte porque su consulta recorre
+       todo el periodo enriquecido y tarda mas que la de arriba. -->
+  <div class="seccion">Dinero</div>
+  <div id="kpisDesc" class="row g-3 mb-3"></div>
+  <!-- Panel de analisis. Cerrado de entrada: son graficos de apoyo, no lo
+       que se viene a ver, y abiertos empujarian la tabla fuera de pantalla.
+       Se usa <details> nativo y no un acordeon propio porque asi funciona
+       el teclado, el lector de pantalla y el Ctrl+F del navegador sin que
+       haya que programar nada. Lo de adentro se consulta la primera vez
+       que se abre, no en cada busqueda. -->
+  <details class="panel-analisis" id="panelAnalisis">
+    <summary>
+      <span class="mas" aria-hidden="true"></span>
+      <span class="rot">Análisis</span>
+      <span class="pista-sum">Gráficos de apoyo sobre lo que hay filtrado</span>
+    </summary>
+    <div class="cuerpo-analisis">
+      <div class="gr-cab">
+        <h3>Viajes por cliente</h3>
+        <span class="gr-nota" id="notaViajes"></span>
+      </div>
+      <div id="graficoViajes" class="grafico-barras">
+        <p class="gr-vacio">Calculando…</p>
+      </div>
+    </div>
+  </details>
+
+  <!-- La tabla tambien va plegada. Es la parte mas pesada de la pantalla
+       -- cuarenta y siete columnas -- y la mayoria de las consultas se
+       resuelven mirando los indicadores y el cumplimiento por agencia. El
+       conteo de filas se anuncia en el titulo para que valga la pena
+       abrirla solo cuando hay algo que mirar linea por linea.
+       La consulta SI se sigue haciendo con el panel cerrado: es la rapida,
+       y de ella salen el total de filas y el contador de la barra. -->
+  <details class="panel-analisis tabla-plegada" id="panelTabla">
+    <summary>
+      <span class="mas" aria-hidden="true"></span>
+      <span class="rot">Seguimiento por línea</span>
+      <span class="pista-sum" id="contadorTabla">detalle de cada remesa</span>
+    </summary>
+    <div class="cuerpo-analisis">
+
+  <div class="marco-tabla">
+    <table class="table table-sm table-hover tabla-rebate mb-0">
+      <thead><tr>
+        <th class="orden" data-orden="Agencia">Agencia<span class="flecha"></span></th><th class="orden" data-orden="IdCia">Cía<span class="flecha"></span></th><th class="orden" data-orden="Fecha">Fecha<span class="flecha"></span></th><th class="orden" data-orden="NumManif">Manif<span class="flecha"></span></th><th class="orden" data-orden="NumOrden">Remesa<span class="flecha"></span></th><th class="orden" data-orden="Item">It<span class="flecha"></span></th>
+        <th class="orden" data-orden="IdVehiculo">Vehículo<span class="flecha"></span></th><th class="orden" data-orden="NitCliente">NIT<span class="flecha"></span></th><th class="orden" data-orden="NombreCliente">Cliente<span class="flecha"></span></th>
+        <th class="orden" data-orden="IdentificacionPoseedor">Ident. poseedor<span class="flecha"></span></th><th class="orden" data-orden="Poseedor">Poseedor<span class="flecha"></span></th>
+        <th class="orden" data-orden="NombreConductor">Conductor<span class="flecha"></span></th><th class="orden" data-orden="TelMovilConductor">Tel. conductor<span class="flecha"></span></th><th class="orden" data-orden="AFILIADO">Afil<span class="flecha"></span></th><th class="orden" data-orden="TipoAfiVehic">Flota<span class="flecha"></span></th>
+        <th class="orden" data-orden="MunicipioOrigen">Origen<span class="flecha"></span></th><th class="orden" data-orden="MunicipioDestino">Destino<span class="flecha"></span></th>
+        <th class="orden num" data-orden="TarifClie">Tarif. cliente<span class="flecha"></span></th><th class="orden num" data-orden="TarifPago">Tarif. pago<span class="flecha"></span></th>
+        <th class="orden num" data-orden="PesoFinalMenor">Peso final<span class="flecha"></span></th><th class="orden num" data-orden="TarifaFactura">Tarifa factura<span class="flecha"></span></th>
+        <th class="orden" data-orden="FechaFacturacion">Fec. factura<span class="flecha"></span></th><th class="orden" data-orden="NumeroFactura">Factura<span class="flecha"></span></th>
+        <th class="orden num" data-orden="PesoFacturaKg">Peso factura<span class="flecha"></span></th><th class="orden num" data-orden="ValorFactura">Valor factura<span class="flecha"></span></th><th class="orden num" data-orden="DescuentoFactura">Desc. factura<span class="flecha"></span></th><th class="orden num" data-orden="ValorFinal">Valor final<span class="flecha"></span></th>
+        <th class="orden num" data-orden="Cumplido">Cumplido<span class="flecha"></span></th><th class="orden" data-orden="FechaCump">Fec. cumplido<span class="flecha"></span></th>
+        <th class="orden num" data-orden="PesoCargue">Cargue<span class="flecha"></span></th><th class="orden num" data-orden="PesoDescargue">Descargue<span class="flecha"></span></th><th class="orden num" data-orden="Faltante">Faltante<span class="flecha"></span></th>
+        <th class="orden" data-orden="ODP">ODP<span class="flecha"></span></th><th class="orden" data-orden="FechaOrdenPago">Fec. ODP<span class="flecha"></span></th><th class="orden num" data-orden="TarifaPagoODP">Tarifa ODP<span class="flecha"></span></th><th class="orden num" data-orden="PesoODP" title="Peso con el que se liquidó la orden de pago. Es del manifiesto: en uno con varias remesas se repite en todas sus líneas.">Peso ODP<span class="flecha"></span></th>
+        <th class="orden num" data-orden="VrPagoFletes">Pago fletes<span class="flecha"></span></th><th class="orden num" data-orden="DescuentoFlete">Desc. flete<span class="flecha"></span></th><th class="orden num" data-orden="FleteFinal">Flete final<span class="flecha"></span></th><th class="orden num" data-orden="BonoxRemesa">Bono x remesa<span class="flecha"></span></th><th class="orden num" data-orden="CausacionPorRemesa">Causación<span class="flecha"></span></th><th class="orden num" data-orden="CargYDescxRemesa">Carg. y desc.<span class="flecha"></span></th><th class="orden num" data-orden="Utilidad">Utilidad<span class="flecha"></span></th><th class="orden num" data-orden="UtilidadReal">Utilidad real<span class="flecha"></span></th><th class="orden num" data-orden="PctUtilPresupuesto">% util. presup.<span class="flecha"></span></th><th class="orden num" data-orden="PctUtilidadSin27">% util. s/2,7%<span class="flecha"></span></th><th class="orden num" data-orden="PctUtilidadCon27">% util. c/2,7%<span class="flecha"></span></th>
+      </tr></thead>
+      <tbody id="cuerpo">
+        <tr><td colspan="47" class="text-center text-muted py-5">Presiona Consultar</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <nav class="mt-3"><ul class="pagination pagination-sm" id="paginacion"></ul></nav>
+
+    </div>
+  </details>
+
+  <!-- Cumplimiento por agencia. Replica la hoja "Presupuesto" del BI, pero
+       juntando en una sola tabla lo real y la meta: alla son dos tablas
+       separadas y comparar obliga a ir y volver con el dedo. -->
+  <div class="cab-agencias">
+    <div>
+      <h2 class="titulo-panel">Cumplimiento por agencia</h2>
+      <div id="notaAgencias" class="nota-seccion"></div>
+    </div>
+    <!-- La leyenda va PEGADA a la tabla, no al pie de la pagina: un
+         semaforo que hay que ir a buscar para entenderlo no es un
+         semaforo. Los cuadros usan el mismo relleno que las celdas. -->
+    <div class="leyenda-semaforo">
+      <span class="lg cumple"><i></i>Cumplió la meta · 100% o más</span>
+      <span class="lg cerca"><i></i>Cerca · entre 85% y 99%</span>
+      <span class="lg falla"><i></i>Por debajo · menos de 85%</span>
+    </div>
+  </div>
+  <div class="marco-agencias">
+    <table class="table table-sm tabla-agencias mb-0">
+      <!-- Anchos fijos: cinco columnas iguales. Sin esto el navegador le
+           regala el sobrante a la primera columna que no tenga contenido
+           rigido y las demas quedan apretadas. -->
+      <colgroup>
+        <col style="width:20%"><col style="width:20%"><col style="width:20%">
+        <col style="width:20%"><col style="width:20%">
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="ag">Agencia</th>
+          <th>Toneladas</th><th>Ventas</th><th>Utilidad</th>
+          <th>Utilidad por tonelada</th>
+        </tr>
+      </thead>
+      <tbody id="cuerpoAgencias">
+        <tr><td colspan="5" class="text-center text-muted py-4">Calculando…</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="pie-agencias" id="pieAgencias"></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/rebate.js?v=<%= v %>"></script>
+</body>
+</html>

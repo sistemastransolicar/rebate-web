@@ -1,0 +1,304 @@
+:root{
+  --navy-900:#08192E; --navy-800:#0B2545; --navy-700:#13315C; --navy-100:#E7ECF3;
+  /* Azul corporativo, tomado del logo (#008FD5). Reemplaza al dorado, que
+     no pertenece a la identidad de la marca.
+       600 para botones y texto sobre blanco (contraste suficiente)
+       500 es el color de marca
+       400 aclarado, para leerse sobre el azul oscuro de la barra
+       100 / 050 fondos */
+  --cian-600:#0077B3; --cian-500:#008FD5; --cian-400:#4FB3E8;
+  --cian-100:#DCEEF9; --cian-050:#EFF7FD;
+  /* El ambar queda SOLO para avisos. Un color de advertencia es
+     semantico, no de marca: si se usa como acento deja de alertar. */
+  --ambar-500:#C9A227; --ambar-400:#E0B93B; --ambar-100:#F7EFD6;
+  --gris-050:#F6F7F9; --gris-300:#D4D9E0; --gris-600:#5B6675;
+}
+/* Tipografia corporativa.
+
+   Proxima Nova es comercial: no se puede empotrar en el sitio sin
+   licencia. Se pide primero por si esta instalada en el equipo -- ahi el
+   navegador la usa tal cual -- y si no, cae en Montserrat, que es la
+   sustituta libre mas cercana. Los nombres alternos son como la
+   registran distintas versiones de la fuente en Windows. */
+:root{
+  --fuente: "Proxima Nova", "Proxima Nova Rg", "ProximaNova-Regular", "Proxima Nova Regular",
+            Montserrat, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+body{background:var(--gris-050);color:var(--navy-900);font-family:var(--fuente);}
+.form-control, .form-select, .btn, .table, input, select, textarea{font-family:var(--fuente);}
+
+.navbar-rebate{background:var(--navy-800);border-bottom:3px solid var(--cian-500);
+               padding-top:.4rem;padding-bottom:.4rem;}
+.navbar-rebate .marca{display:flex;align-items:center;gap:12px;text-decoration:none;}
+.navbar-rebate .marca img{height:34px;width:auto;display:block;}
+/* El nombre del modulo se separa del logo con una linea, no con un punto:
+   asi queda claro que "Rebate" no es parte de la marca. */
+.navbar-rebate .marca .modulo{color:var(--cian-400);font-weight:600;font-size:1rem;
+                              letter-spacing:.4px;padding-left:12px;
+                              border-left:1px solid rgba(255,255,255,.28);line-height:1.1;}
+@media (max-width: 575.98px){
+  .navbar-rebate .marca img{height:26px;}
+  .navbar-rebate .marca .modulo{font-size:.85rem;}
+}
+.card{border:1px solid var(--gris-300);border-radius:10px;box-shadow:0 1px 2px rgba(8,25,46,.06);}
+.card-header{background:var(--navy-100);border-bottom:1px solid var(--gris-300);
+             font-weight:600;color:var(--navy-800);}
+.btn-navy{background:var(--navy-700);border-color:var(--navy-700);color:#fff;}
+.btn-navy:hover{background:var(--navy-800);border-color:var(--navy-800);color:#fff;}
+.btn-acento{background:var(--cian-600);border-color:var(--cian-600);color:#fff;font-weight:600;}
+.btn-acento:hover{background:var(--cian-500);border-color:var(--cian-500);color:#fff;}
+.table thead th{background:var(--navy-700);color:#fff;font-weight:600;
+                font-size:.82rem;text-transform:uppercase;letter-spacing:.4px;}
+.table tbody tr.inactiva{opacity:.5;}
+.badge-factura{background:var(--navy-700);}
+.badge-flete{background:var(--cian-500);color:#fff;}
+.prioridad{font-variant-numeric:tabular-nums;font-weight:600;color:var(--gris-600);}
+.ruta-chip{display:inline-block;background:var(--cian-100);border:1px solid var(--cian-500);
+           border-radius:12px;padding:1px 9px;font-size:.78rem;margin:1px 2px;}
+.tabla-scroll{overflow-x:auto;}
+
+/* --- listado Rebate --- */
+.barra-filtros{background:#fff;border:1px solid var(--gris-300);border-radius:10px;padding:12px 14px;}
+.tabla-rebate{font-size:.8rem;}
+.tabla-rebate thead th{position:sticky;top:0;z-index:2;white-space:nowrap;font-size:.7rem;}
+.tabla-rebate td{white-space:nowrap;}
+.tabla-rebate td.num{text-align:right;font-variant-numeric:tabular-nums;}
+/* Hover apenas perceptible; la seleccion, un poco mas marcada pero
+   igual de clara: la fila hay que poder LEERLA mientras se sigue de
+   punta a punta, y un fondo oscuro obliga a cambiar el color del texto y
+   pelea con las celdas que ya tienen color propio. */
+.tabla-rebate tbody tr:hover{background:var(--cian-050);}
+.tabla-rebate tbody tr.fila-sel,
+.tabla-rebate tbody tr.fila-sel:hover{background:var(--cian-100);}
+/* La marca de la izquierda es lo que permite ubicar la fila cuando se
+   vuelve del extremo derecho de la tabla. */
+.tabla-rebate tbody tr.fila-sel > td:first-child{box-shadow:inset 3px 0 0 var(--cian-500);}
+.tabla-rebate tbody tr.fila-sel > td{border-top-color:var(--cian-400);
+                                     border-bottom-color:var(--cian-400);}
+.tabla-rebate tbody tr{cursor:pointer;}
+/* Las celdas con color propio se aclaran sobre la fila seleccionada para
+   que no se pierdan ni la tapen. */
+.tabla-rebate tbody tr.fila-sel td.util-real{background:#C9E4F5;}
+.marco-tabla{max-height:65vh;overflow:auto;border:1px solid var(--gris-300);border-radius:8px;}
+.pill-si{background:#1c7c40;color:#fff;border-radius:10px;padding:0 7px;font-size:.7rem;}
+.pill-no{background:var(--gris-600);color:#fff;border-radius:10px;padding:0 7px;font-size:.7rem;}
+.meta{font-size:.78rem;color:var(--gris-600);}
+
+/* --- tarjetas KPI --- */
+.kpi{background:#fff;border:1px solid var(--gris-300);border-radius:10px;
+     padding:10px 12px;height:100%;border-left:4px solid var(--navy-700);}
+.kpi.acento{border-left-color:var(--cian-500);}
+.kpi.alerta{border-left-color:#B4232A;background:#FDF6F6;}
+.kpi.alerta .valor{color:#B4232A;}
+.kpi .rotulo{font-size:.68rem;text-transform:uppercase;letter-spacing:.5px;
+             color:var(--gris-600);font-weight:600;}
+.kpi .valor{font-size:1.35rem;font-weight:700;color:var(--navy-800);
+            font-variant-numeric:tabular-nums;line-height:1.25;
+            white-space:nowrap;letter-spacing:-.3px;}
+.kpi .valor.sm{font-size:1.15rem;}
+.kpi .valor.xs{font-size:.98rem;letter-spacing:-.5px;}
+.kpi .pie{font-size:.7rem;color:var(--gris-600);}
+.kpi.cargando .valor{color:var(--gris-300);}
+
+/* --- encabezados ordenables --- */
+th.orden{cursor:pointer;user-select:none;padding-right:20px!important;position:relative;
+         transition:background .12s;}
+th.orden:hover{background:var(--cian-500)!important;color:var(--navy-900)!important;}
+th.orden:hover .flecha{color:var(--navy-900);opacity:1;}
+th.orden .flecha{position:absolute;right:5px;top:50%;transform:translateY(-50%);
+                 opacity:.55;font-size:.72rem;color:#fff;line-height:1;}
+th.orden .flecha::after{content:'\2195';}
+th.orden.asc .flecha,
+th.orden.desc .flecha{opacity:1;color:var(--cian-400);font-size:.8rem;}
+th.orden.asc  .flecha::after{content:'\25B2';}
+th.orden.desc .flecha::after{content:'\25BC';}
+th.orden.asc, th.orden.desc{background:var(--navy-900)!important;}
+th.orden.asc:hover .flecha,
+th.orden.desc:hover .flecha{color:var(--navy-900);}
+.modo-completo{color:var(--cian-500);font-weight:600;}
+
+/* --- pestañas de ámbito --- */
+.nav-tabs.ambitos{border-bottom:2px solid var(--navy-700);}
+.nav-tabs.ambitos .nav-link{border:1px solid var(--gris-300);border-bottom:none;
+  border-radius:10px 10px 0 0;background:var(--gris-050);color:var(--gris-600);
+  padding:8px 18px;margin-right:4px;text-align:left;line-height:1.25;}
+.nav-tabs.ambitos .nav-link strong{color:var(--navy-800);}
+.nav-tabs.ambitos .nav-link .sub{display:block;font-size:.7rem;color:var(--gris-600);}
+.nav-tabs.ambitos .nav-link .conteo{display:inline-block;background:var(--gris-300);
+  color:var(--navy-800);border-radius:9px;padding:0 7px;font-size:.7rem;
+  font-weight:700;margin-top:3px;}
+.nav-tabs.ambitos .nav-link.activa{background:#fff;border-color:var(--navy-700);
+  border-top:3px solid var(--cian-500);color:var(--navy-900);}
+.nav-tabs.ambitos .nav-link.activa .conteo{background:var(--cian-500);}
+.cuerpo-pestana{border-top-left-radius:0;}
+.badge-cond{background:var(--navy-100);color:var(--navy-800);border-radius:9px;
+  padding:1px 7px;font-size:.72rem;}
+
+/* Celda sin dato propio: el valor pertenece a la remesa, no a esta linea.
+   Rayado diagonal suave para que no se confunda con un cero. */
+.tabla-rebate td.celda-nd{
+  color:var(--gris-600);
+  cursor:help;
+  background-image:repeating-linear-gradient(
+      45deg,
+      rgba(11,37,69,.06) 0 5px,
+      rgba(11,37,69,0)   5px 10px);
+  border-left:2px solid var(--gris-300);
+}
+.tabla-rebate tbody tr:hover td.celda-nd{
+  background-image:repeating-linear-gradient(
+      45deg,
+      rgba(201,162,39,.30) 0 5px,
+      rgba(201,162,39,0)   5px 10px);
+}
+
+/* --- remesa repartida en varias facturas --- */
+.tabla-rebate .marca-split{
+  display:inline-block;margin-left:5px;padding:0 5px;
+  border:1px solid var(--cian-500);border-radius:8px;
+  background:var(--cian-100);color:var(--navy-800);
+  font-size:.66rem;font-weight:700;line-height:1.55;
+  white-space:nowrap;cursor:help;vertical-align:1px;}
+
+/* --- linea sin condicion de descuento aplicable --- */
+.tabla-rebate td.sin-regla{color:var(--gris-600);}
+
+/* --- valor final: es la cifra que se lee, se destaca --- */
+.tabla-rebate td.final{font-weight:700;color:var(--navy-800);
+  background:rgba(201,162,39,.07);border-left:1px solid var(--cian-500);}
+.tabla-rebate tbody tr:hover td.final{background:rgba(201,162,39,.22);}
+
+/* --- bono con ajuste manual por manifiesto --- */
+.tabla-rebate td.bono-ajustado{position:relative;cursor:help;
+  box-shadow:inset 3px 0 0 var(--cian-500);}
+
+/* --- estado del listado de afiliados --- */
+/* El chip vive en la barra superior y esta siempre; la franja solo
+   aparece cuando hay algo que decir. */
+.chip-afiliados{display:inline-block;border-radius:12px;padding:2px 10px;margin-right:10px;
+                font-size:.74rem;font-weight:600;vertical-align:middle;white-space:nowrap;
+                background:rgba(255,255,255,.14);color:#fff;border:1px solid transparent;}
+.chip-afiliados.ok{background:rgba(28,124,64,.25);border-color:#3FA26A;color:#CFF3DE;}
+.chip-afiliados.aviso{background:rgba(224,185,59,.22);border-color:var(--ambar-400);color:#FBEFC6;}
+.chip-afiliados.alerta{background:#B4232A;border-color:#E4646A;color:#fff;}
+.chip-afiliados:empty{display:none;}
+
+.aviso-afiliados{border-radius:10px;padding:12px 14px;margin-bottom:14px;
+                 border:1px solid var(--gris-300);background:#fff;
+                 display:flex;gap:12px;align-items:flex-start;}
+.aviso-afiliados.aviso{border-left:5px solid var(--ambar-500);background:#FFFCF0;}
+.aviso-afiliados.alerta{border-left:5px solid #B4232A;background:#FDF4F4;}
+.aviso-afiliados .icono{font-size:1.3rem;line-height:1.2;}
+.aviso-afiliados .titulo{font-weight:600;color:var(--navy-900);}
+.aviso-afiliados.alerta .titulo{color:#8C1A20;}
+.aviso-afiliados .texto{font-size:.86rem;color:var(--gris-600);margin-top:2px;}
+.aviso-afiliados .tecnico{font-size:.76rem;color:var(--gris-600);margin-top:6px;
+                          font-family:ui-monospace,Consolas,monospace;word-break:break-word;}
+.aviso-afiliados .acciones{margin-left:auto;display:flex;gap:6px;align-items:center;
+                           white-space:nowrap;}
+
+/* Utilidad real cuando devolvio el descuento general del 2,6/2,7%. */
+.tabla-rebate td.util-real{background:var(--cian-100);}
+
+/* =====================================================================
+   Barra de filtros
+   ===================================================================== */
+.barra-filtros{padding:10px 14px 8px;}
+.barra-filtros .form-label{color:var(--gris-600);font-weight:600;font-size:.72rem;
+                           text-transform:uppercase;letter-spacing:.3px;}
+/* Un manifiesto son seis digitos; el campo se ajusta a eso en vez de
+   estirarse y quitarle sitio al cliente. */
+.campo-manif{width:110px;}
+/* Una placa son seis caracteres. Se escriben en mayuscula sola para no
+   depender de como venga tecleada: el filtro compara en mayuscula. */
+.campo-placa{width:100px;text-transform:uppercase;}
+.campo-placa::placeholder{text-transform:none;}
+
+/* Contador de filtros puestos en el panel. Vacio no ocupa nada: un "0"
+   permanente se vuelve parte del boton y deja de leerse. */
+.contador{display:none;}
+.contador.hay{display:inline-block;min-width:18px;padding:0 5px;margin-left:6px;
+              border-radius:9px;background:var(--cian-500);color:var(--navy-900);
+              font-size:.72rem;font-weight:700;line-height:18px;text-align:center;}
+
+.chip-filtro{display:inline-flex;align-items:center;gap:5px;
+             background:var(--navy-100);border:1px solid var(--gris-300);
+             border-radius:14px;padding:2px 6px 2px 10px;font-size:.78rem;
+             color:var(--navy-800);white-space:nowrap;}
+.chip-filtro .et{color:var(--gris-600);font-weight:600;}
+.chip-filtro .x{border:0;background:none;line-height:1;padding:0 3px;
+                color:var(--gris-600);font-size:1.05rem;cursor:pointer;border-radius:50%;}
+.chip-filtro .x:hover{background:#B4232A;color:#fff;}
+
+/* Panel lateral */
+#panelFiltros{width:360px;}
+#panelFiltros .offcanvas-header{background:var(--navy-800);color:#fff;padding:.75rem 1rem;}
+#panelFiltros .offcanvas-header .btn-close{filter:invert(1) grayscale(1) brightness(2);}
+.grupo-filtro{border-top:1px solid var(--gris-300);padding:12px 0;}
+.grupo-filtro:first-child{border-top:0;padding-top:4px;}
+.titulo-grupo{font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;
+              font-weight:700;color:var(--navy-700);margin-bottom:8px;}
+.nota-grupo{font-size:.74rem;color:var(--gris-600);margin:-2px 0 8px;line-height:1.35;}
+
+/* Barra de progreso de las tarjetas. Va al pie y es delgada: informa de
+   un vistazo sin competir con el numero, que es lo que se viene a leer. */
+.kpi .barra{height:5px;border-radius:3px;background:var(--gris-300);
+            margin-top:8px;overflow:hidden;}
+.kpi .barra i{display:block;height:100%;border-radius:3px;
+              background:var(--navy-700);transition:width .35s ease;}
+.kpi.acento    .barra i{background:var(--cian-500);}
+.kpi.alerta .barra i{background:#B4232A;}
+.kpi.alerta .barra{background:#F2D4D6;}
+
+/* =====================================================================
+   Pantalla de acceso a Condiciones
+   ===================================================================== */
+.pantalla-acceso{min-height:100vh;display:flex;align-items:center;justify-content:center;
+                 background:var(--navy-800);padding:20px;}
+.caja-acceso{background:#fff;border-radius:12px;padding:32px 30px 24px;width:100%;
+             max-width:380px;box-shadow:0 10px 30px rgba(8,25,46,.35);text-align:center;}
+.caja-acceso .logo{height:44px;margin-bottom:18px;}
+.caja-acceso h1{font-size:1.15rem;font-weight:700;color:var(--navy-800);margin-bottom:6px;}
+.caja-acceso .explica{font-size:.84rem;color:var(--gris-600);margin-bottom:18px;line-height:1.4;}
+.caja-acceso form{text-align:left;}
+.caja-acceso .volver{display:inline-block;margin-top:18px;font-size:.8rem;
+                     color:var(--gris-600);text-decoration:none;}
+.caja-acceso .volver:hover{color:var(--cian-600);}
+
+/* =====================================================================
+   Rutas de una condicion
+
+   Una regla migrada del DAX puede traer diez pares origen-destino. En
+   linea seguida eso es un muro de fichas que nadie lee. Se agrupan por
+   origen -- que es como estan escritas las condiciones de verdad -- y se
+   muestran las dos primeras; el resto se despliega.
+   ===================================================================== */
+.rutas{display:flex;flex-direction:column;gap:3px;}
+.ruta-linea{display:flex;align-items:baseline;gap:6px;font-size:.78rem;line-height:1.35;}
+.ruta-linea .origen{font-weight:600;color:var(--navy-800);white-space:nowrap;}
+.ruta-linea .flecha-ruta{color:var(--gris-600);}
+.ruta-linea .destinos{color:var(--navy-900);}
+.ruta-linea.excluida{color:#B4232A;}
+.ruta-linea.excluida .origen{color:#B4232A;}
+.ruta-linea.excluida::before{content:"no aplica";font-size:.66rem;text-transform:uppercase;
+                             letter-spacing:.4px;background:#FDECEC;border:1px solid #E9A8AB;
+                             color:#8C1A20;border-radius:8px;padding:0 5px;margin-right:2px;}
+.mas-rutas{border:0;background:none;padding:0;font-size:.74rem;font-weight:600;
+           color:var(--cian-600);cursor:pointer;text-align:left;}
+.mas-rutas:hover{text-decoration:underline;}
+/* El asterisco marca coincidencia parcial: *CARTAGENA* calza con
+   "CARTAGENA BOSQUE". Se distingue del texto para que no se lea como
+   parte del nombre del municipio. */
+.comodin{color:var(--cian-600);font-weight:700;}
+
+/* Tarjetas que ademas filtran la tabla. */
+.kpi.pulsable{cursor:pointer;transition:box-shadow .15s ease, transform .15s ease;}
+.kpi.pulsable:hover{box-shadow:0 4px 14px rgba(8,25,46,.14);transform:translateY(-1px);}
+.kpi.pulsable:focus-visible{outline:2px solid var(--cian-500);outline-offset:2px;}
+.kpi .accion{margin-top:8px;font-size:.72rem;font-weight:600;color:var(--cian-600);
+             text-transform:uppercase;letter-spacing:.3px;}
+.kpi.alerta .accion{color:#B4232A;}
+/* Con el filtro puesto la tarjeta queda marcada: si no, quedaria una
+   tabla filtrada sin nada que recuerde por que. */
+.kpi.filtrada{border-color:var(--cian-500);box-shadow:inset 0 0 0 1px var(--cian-500);}
+.kpi.filtrada .accion{color:var(--navy-800);}

@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= titulo %></title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Proxima Nova es una fuente comercial: no se puede empotrar sin licencia.
+     Se usa si esta instalada en el equipo; si no, cae en Montserrat, que es
+     la sustituta libre mas cercana (geometrica, misma epoca, mismo aire). -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="/img/logo-transolicar.png?v=<%= v %>">
+<link href="/css/estilos.css?v=<%= v %>" rel="stylesheet">
+</head>
+<body>
+<header class="banda">
+  <div class="banda-top">
+    <a href="/rebate"><img src="/img/logo-transolicar-blanco.png?v=<%= v %>"
+         alt="Transolicar"></a>
+    <div class="acciones">
+      <a href="/rebate" class="btn btn-sm btn-outline-light">Informe</a>
+      <a href="/reglas" class="btn btn-sm btn-acento">Condiciones</a>
+      <form method="post" action="/reglas/salir" class="d-inline">
+        <button class="btn btn-sm btn-outline-light"
+                title="Cierra la sesión y vuelve a pedir la clave">Salir</button>
+      </form>
+    </div>
+  </div>
+  <div class="banda-cuerpo">
+    <div>
+      <div class="contexto">Motor de descuentos · dbRebate</div>
+      <h1>Condiciones de Rebate</h1>
+      <div class="periodo">Lo que se le descuenta al cliente y al afiliado</div>
+    </div>
+  </div>
+</header>
+
+<div class="container-fluid px-4">
+
+  <ul class="nav nav-tabs ambitos mb-0" id="pestanas">
+    <li class="nav-item">
+      <button class="nav-link activa" data-ambito="FACTURA">
+        Descuento a la <strong>FACTURA</strong>
+        <span class="sub">lo que se le descuenta al cliente</span>
+        <span class="conteo" id="n-FACTURA">—</span>
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-ambito="FLETE">
+        Descuento al <strong>FLETE</strong>
+        <span class="sub">lo que se le descuenta al afiliado</span>
+        <span class="conteo" id="n-FLETE">—</span>
+      </button>
+    </li>
+  </ul>
+
+  <div class="row g-4 mt-0">
+    <div class="col-xl-8">
+      <div class="card cuerpo-pestana">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span id="tituloLista">Condiciones de factura</span>
+          <div>
+            <div class="form-check form-check-inline small">
+              <input class="form-check-input" type="checkbox" id="fActivas" checked>
+              <label class="form-check-label" for="fActivas">Solo activas</label>
+            </div>
+            <input id="fNit" class="form-control form-control-sm d-inline-block"
+                   style="width:150px" placeholder="Filtrar por NIT">
+            <button class="btn btn-acento btn-sm ms-1" id="btnNueva">+ Nueva</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="tabla-scroll">
+            <table class="table table-sm table-hover align-middle mb-0">
+              <thead><tr>
+                <th class="orden" data-orden="Prioridad">Pri<span class="flecha"></span></th>
+                <th class="orden" data-orden="Nombre">Nombre<span class="flecha"></span></th>
+                <th class="orden" data-orden="NitCliente">NIT<span class="flecha"></span></th>
+                <th class="orden" data-orden="Rutas">Rutas<span class="flecha"></span></th>
+                <th class="orden" data-orden="Vigencia">Vigencia<span class="flecha"></span></th>
+                <th class="orden" data-orden="Condicion" id="thCondicion">Condición<span class="flecha"></span></th>
+                <th class="orden text-end" data-orden="Valor">Descuento<span class="flecha"></span></th>
+                <th></th>
+              </tr></thead>
+              <tbody id="tbody">
+                <tr><td colspan="8" class="text-center text-muted py-4">Cargando…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-4">
+      <div class="card">
+        <div class="card-header">Simulador</div>
+        <div class="card-body">
+          <p class="text-muted small mb-2">
+            Prueba un escenario contra las condiciones activas del ámbito
+            <strong id="ambitoSim">FACTURA</strong> antes de publicar una regla.
+          </p>
+          <form id="formSim" class="row g-2">
+            <div class="col-6"><label class="form-label small mb-1">NIT cliente</label>
+              <input name="nitCliente" class="form-control form-control-sm"></div>
+            <div class="col-6"><label class="form-label small mb-1">Fecha</label>
+              <input name="fecha" type="date" class="form-control form-control-sm"></div>
+            <div class="col-6"><label class="form-label small mb-1">Origen</label>
+              <input name="origen" class="form-control form-control-sm"></div>
+            <div class="col-6"><label class="form-label small mb-1">Destino</label>
+              <input name="destino" class="form-control form-control-sm"></div>
+            <div class="col-6"><label class="form-label small mb-1">Afiliado</label>
+              <select name="afiliado" class="form-select form-select-sm">
+                <option value="">-</option><option value="1">Sí</option><option value="0">No</option>
+              </select></div>
+            <div class="col-6"><label class="form-label small mb-1">Flota</label>
+              <select name="tipoAfiVehic" class="form-select form-select-sm">
+                <option value="">-</option><option value="PROPIO">Propio</option>
+                <option value="TERCEROS">Terceros</option>
+              </select></div>
+            <div class="col-6"><label class="form-label small mb-1">Valor base</label>
+              <input name="valorBase" type="number" step="0.01" class="form-control form-control-sm" value="0"></div>
+            <div class="col-6"><label class="form-label small mb-1">Peso (kg)</label>
+              <input name="pesoKg" type="number" step="1" class="form-control form-control-sm" value="0"></div>
+            <div class="col-12 mt-3"><button class="btn btn-navy btn-sm w-100">Simular</button></div>
+          </form>
+          <div id="resultadoSim" class="mt-3"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalRegla" tabindex="-1">
+ <div class="modal-dialog modal-lg">
+  <div class="modal-content">
+   <form id="formRegla">
+    <div class="modal-header">
+      <h6 class="modal-title" id="modalTitulo">Nueva condición</h6>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" name="IdRegla">
+      <input type="hidden" name="Ambito">
+      <div class="alert alert-light border py-2 small mb-3" id="avisoAmbito"></div>
+      <div class="row g-3">
+        <div class="col-md-8"><label class="form-label small">Nombre *</label>
+          <input name="Nombre" class="form-control" required maxlength="120"
+                 placeholder="MILPA Cucunubá desde julio 2026"></div>
+        <div class="col-md-4"><label class="form-label small">Prioridad *</label>
+          <input name="Prioridad" type="number" class="form-control" required value="500" min="1" max="9999">
+          <div class="form-text">Menor = se evalúa antes</div></div>
+
+        <div class="col-md-4"><label class="form-label small">NIT cliente</label>
+          <input name="NitCliente" class="form-control" maxlength="20" placeholder="Vacío = todos"></div>
+        <div class="col-md-4"><label class="form-label small">Vigente desde</label>
+          <input name="VigenteDesde" type="date" class="form-control"></div>
+        <div class="col-md-4"><label class="form-label small">Vigente hasta</label>
+          <input name="VigenteHasta" type="date" class="form-control">
+          <div class="form-text">Vacío = indefinido</div></div>
+
+        <div class="col-md-4"><label class="form-label small">Tipo de cálculo *</label>
+          <select name="TipoCalculo" class="form-select" required>
+            <option value="PORCENTAJE">Porcentaje del valor base</option>
+            <option value="FIJO">Valor fijo</option>
+            <option value="POR_TONELADA">Valor por tonelada</option>
+          </select></div>
+        <div class="col-md-4"><label class="form-label small">Valor *</label>
+          <input name="Valor" type="number" step="0.000001" class="form-control" required>
+          <div class="form-text" id="ayudaValor">0.08 = 8%</div></div>
+        <div class="col-md-2"><label class="form-label small">Afiliado</label>
+          <select name="RequiereAfiliado" class="form-select">
+            <option value="">Indiferente</option>
+            <option value="true">Solo afiliados</option>
+            <option value="false">Solo no afiliados</option>
+          </select></div>
+        <div class="col-md-2"><label class="form-label small">Flota</label>
+          <select name="TipoAfiVehic" class="form-select">
+            <option value="">Cualquiera</option>
+            <option value="PROPIO">Propio</option>
+            <option value="TERCEROS">Terceros</option>
+          </select></div>
+
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-center">
+            <label class="form-label small mb-0">Rutas
+              <span class="text-muted">(sin rutas = aplica a todas)</span></label>
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="btnAddRuta">+ Ruta</button>
+          </div>
+          <div id="rutas" class="mt-2"></div>
+        </div>
+
+        <div class="col-12"><label class="form-label small">Observación</label>
+          <textarea name="Observacion" class="form-control" rows="2" maxlength="500"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Cancelar</button>
+      <button class="btn btn-acento btn-sm">Guardar</button>
+    </div>
+   </form>
+  </div>
+ </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/reglas.js?v=<%= v %>"></script>
+</body>
+</html>
